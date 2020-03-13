@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  </head>
+  <body  style="background-color:#000000;">
+    <div class="container">
+
+  <h1 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">Detected Multiple Faces Images</h1>
+
+  <hr class="mt-2 mb-5">
+  <div class="row text-center text-lg-left">
+{% if mult %}
+    {% if m|int <= 8 %}
+      {% for i in range(m|int) %}
+      <div class="col-lg-3 col-md-4 col-6">
+        <a href="#" class="d-block mb-4 h-100">
+              <img class="img-fluid img-thumbnail" src="{{url_for('send_file',filename=mult[i][:])}}" alt="">
+            </a>
+      </div>
+      {% endfor %}
+    {% else %}
+      {% for i in range(7) %}
+      <div class="col-lg-3 col-md-4 col-6">
+        <a href="#" class="d-block mb-4 h-100">
+              <img class="img-fluid img-thumbnail" src="{{url_for('send_file',filename=mult[i][:])}}" alt="">
+            </a>
+      </div>
+      {% endfor %}
+      <div class="col-lg-3 col-md-4 col-6">
+        <a href="/show-all" class="d-block mb-4 h-100">
+              <img class="img-fluid img-thumbnail" src="{{url_for('static',filename='view-all.jpg')}}" alt="">
+            </a>
+      </div>
+    {% endif %}
+  {% else %}
+  <h2 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">No Images Found </h2>
+  {% endif %}
+  </div>
+
+</div>
+<div class="container">
+
+<h1 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">Detected Phones Images</h1>
+
+<hr class="mt-2 mb-5">
+<div class="row text-center text-lg-left">
+{% if phon %}
+  {% if p|int <= 8 %}
+    {% for i in range(p|int) %}
+    <div class="col-lg-3 col-md-4 col-6">
+      <a href="#" class="d-block mb-4 h-100">
+            <img class="img-fluid img-thumbnail" src="{{url_for('send_file_phone',filename=phon[i][:])}}" alt="">
+          </a>
+    </div>
+    {% endfor %}
+  {% else %}
+    {% for i in range(7) %}
+    <div class="col-lg-3 col-md-4 col-6">
+      <a href="#" class="d-block mb-4 h-100">
+            <img class="img-fluid img-thumbnail" src="{{url_for('send_file_phone',filename=phon[i][:])}}" alt="">
+          </a>
+    </div>
+    {% endfor %}
+    <div class="col-lg-3 col-md-4 col-6">
+      <a href="/show-all" class="d-block mb-4 h-100">
+            <img class="img-fluid img-thumbnail" src="{{url_for('stat',filename='view-all.jpg')}}" alt="">
+          </a>
+    </div>
+  {% endif %}
+{% else %}
+<h2 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">No Images Found </h2>
+{% endif %}
+</div>
+
+
+</div>
+  </body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Malpractice Detection in Online Examinations</title>
+      <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Allerta Stencil' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Oswald' rel='stylesheet'>
+
+</head>
+<style>
+  body {
+background-image:url("https://lh3.googleusercontent.com/proxy/mxHznyMw6BFCQPjNXDr-vEGez7QU5tB0Nr3nAlhQsc31auZ2s5XSiRhLU5XGbQ2r4UgxePQSREtiPH-SSaalkgEFijO8Cv46lJQC");
+background-size: cover;
+height: 100%;
+
+}
+
+    .img_holder img{
+        max-width: 100%; max-height: 100%;
+    }
+
+    .btn-file {
+    position: relative;
+    overflow: hidden;
+    }
+    .btn-file input[type=file] {
+        position: absolute;
+        top: 0;
+        right: 0;
+        min-width: 100%;
+        min-height: 100%;
+        font-size: 100px;
+        text-align: right;
+        filter: alpha(opacity=0);
+        opacity: 0;
+        outline: none;
+        background: white;
+        cursor: inherit;
+        display: block;
+    }
+    h2{
+      font-family:'Oswald';
+      font-size:40px;
+    }
+
+</style>
+
+<body >
+<header class="navbar">
+
+  <u style="color:#FFFFFF"><h2 style="margin: auto;width: 80%; text-align: center;color:#FFFFFF; margin-top: 20px;  text-transform: uppercase">Malpractice Detection in Online Examinations</h2></u>
+<br>
+<br>
+<br>
+<br><br>
+<br>
+  <form action="/upload" method="post" enctype="multipart/form-data" style="margin-top: 60px; width: 80%; text-align: center; margin: auto;" onsubmit="showloading()">
+    <div class="row">
+      <div class="col-sm-12 text-center">
+      <span class="btn btn-default btn-file">
+        Select Video <input type="file" name="video" id="fileInput">
+          </span><br><br>
+          <span class="btn btn-default btn-file">
+            Select Question Paper <input type="file" name="text" id="fileInput">
+              </span><br><br>
+     </div>
+</div>
+        <input type="submit" value="Upload" class="btn btn-primary">
+  </form>
+</header>
+
+</body>
+</html>

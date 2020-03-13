@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Malpractice Detection in Online Examinations</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Allerta Stencil' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Baumans' rel='stylesheet'>
+
+<style>
+h3{
+  font-family:'Allerta';
+  color: #FFFFFF;
+}
+h4,p{
+  font-family: 'Baumans';
+  color: #FFFFFF;
+}
+</style>
+</head>
+<body style="background-color:#000000;">
+<br>
+<br><br>
+<br>
+<br>
+<br><br>
+<br><br>
+<br>
+<div style="width: 90%; margin: auto; text-align: center">
+  {% if result == "True" %}
+    <h4 style="margin-top: 20px;font-family='Baumans';font-size:40px"><b><span style="color: red">Malpractices Detected !!</span></b></h4>
+  {% else %}
+  <h4 style="margin-top: 20px;font-family='Baumans';font-size:40px"><b><span style="color: green">No Malpractices Detected !!</span></b></h4>
+  {% endif %}
+  <br>
+  <u><a href="/show">See results</a></u>
+<br>
+<br>
+<br>
+  <u><a href="/">Back to Home</a></u>
+</div>
+</body>
+
+</html>
