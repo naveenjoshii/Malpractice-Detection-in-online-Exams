@@ -30,12 +30,12 @@ h4,p{
 <br>
 <div style="width: 90%; margin: auto; text-align: center">
   {% if result == "True" %}
-    <h4 style="margin-top: 20px;font-family='Baumans';font-size:40px"><b><span style="color: red">Malpractices Detected !!</span></b></h4>
+    <h4 style="margin-top: 20px;font-family='Baumans';font-size:40px"><b><span style="color: red">Probability for malpractice is: <i>{{result}}</i></span></b></h4>
   {% else %}
-  <h4 style="margin-top: 20px;font-family='Baumans';font-size:40px"><b><span style="color: green">No Malpractices Detected !!</span></b></h4>
+  <h4 style="margin-top: 20px;font-family='Baumans';font-size:40px"><b><span style="color: green">Probability for malpractice is: <i>{{result}}</i></span></b></h4>
   {% endif %}
   <br>
-  <u><a href="/show">See results</a></u>
+  <u><a href="{{url_for('show',emotions=emotions|list,data_without_op=data|list)}}">See results</a></u>
 <br>
 <br>
 <br>
