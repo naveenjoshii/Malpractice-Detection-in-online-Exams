@@ -4,8 +4,275 @@
     <meta charset="utf-8">
     <title></title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
+    <!-- Resources -->
+<script src="https://www.amcharts.com/lib/4/core.js"></script>
+<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
   </head>
+  <style>
+  #chartdiv {
+    width: 100%;
+    height: 500px;
+  }
+
+    .container {
+    height: 100%;
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#btnSearch,
+#btnClear{
+display: inline-block;
+vertical-align: top;
+}
+  </style>
+  <script>
+am4core.ready(function() {
+
+// Themes begin
+am4core.useTheme(am4themes_animated);
+// Themes end
+
+/**
+ * Chart design taken from Samsung health app
+ */
+
+var chart = am4core.create("chartdiv", am4charts.XYChart);
+chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+chart.paddingBottom = 30;
+
+chart.data = [{
+    "name": "Angry",
+    "steps": {{emotions[0]}},
+    "href": "https://github.com/naveenjoshii/Malpractice-Detection-in-online-Exams/blob/master/static/angry.png?raw=true"
+}, {
+    "name": "Disgust",
+    "steps": {{emotions[1]}},
+    "href": "https://github.com/naveenjoshii/Malpractice-Detection-in-online-Exams/blob/master/static/disgust.png?raw=true"
+}, {
+    "name": "Fear",
+    "steps": {{emotions[2]}},
+    "href": "https://github.com/naveenjoshii/Malpractice-Detection-in-online-Exams/blob/master/static/fear.png?raw=true"
+}, {
+    "name": "Happy",
+    "steps": {{emotions[3]}},
+    "href": "https://github.com/naveenjoshii/Malpractice-Detection-in-online-Exams/blob/master/static/happy.png?raw=true"
+}, {
+    "name": "Sad",
+    "steps": {{emotions[4]}},
+    "href": "https://github.com/naveenjoshii/Malpractice-Detection-in-online-Exams/blob/master/static/sad.png?raw=true"
+}, {
+    "name": "Surprise",
+    "steps": {{emotions[5]}},
+    "href": "https://github.com/naveenjoshii/Malpractice-Detection-in-online-Exams/blob/master/static/surprise.png?raw=true"
+},{
+    "name": "Neutral",
+    "steps": {{emotions[6]}},
+    "href": "https://github.com/naveenjoshii/Malpractice-Detection-in-online-Exams/blob/master/static/neutral.png?raw=true"
+}];
+
+var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+categoryAxis.dataFields.category = "name";
+categoryAxis.renderer.grid.template.strokeOpacity = 0;
+categoryAxis.renderer.minGridDistance = 10;
+categoryAxis.renderer.labels.template.dy = 35;
+categoryAxis.renderer.tooltip.dy = 35;
+
+var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+valueAxis.renderer.inside = true;
+valueAxis.renderer.labels.template.fillOpacity = 0.3;
+valueAxis.renderer.grid.template.strokeOpacity = 0;
+valueAxis.min = 0;
+valueAxis.cursorTooltipEnabled = false;
+valueAxis.renderer.baseGrid.strokeOpacity = 0;
+
+var series = chart.series.push(new am4charts.ColumnSeries);
+series.dataFields.valueY = "steps";
+series.dataFields.categoryX = "name";
+series.tooltipText = "{valueY.value}";
+series.tooltip.pointerOrientation = "vertical";
+series.tooltip.dy = - 6;
+series.columnsContainer.zIndex = 100;
+
+var columnTemplate = series.columns.template;
+columnTemplate.width = am4core.percent(50);
+columnTemplate.maxWidth = 66;
+columnTemplate.column.cornerRadius(60, 60, 10, 10);
+columnTemplate.strokeOpacity = 0;
+
+series.heatRules.push({ target: columnTemplate, property: "fill", dataField: "valueY", min: am4core.color("#e5dc36"), max: am4core.color("#5faa46") });
+series.mainContainer.mask = undefined;
+
+var cursor = new am4charts.XYCursor();
+chart.cursor = cursor;
+cursor.lineX.disabled = true;
+cursor.lineY.disabled = true;
+cursor.behavior = "none";
+
+var bullet = columnTemplate.createChild(am4charts.CircleBullet);
+bullet.circle.radius = 30;
+bullet.valign = "bottom";
+bullet.align = "center";
+bullet.isMeasured = true;
+bullet.mouseEnabled = false;
+bullet.verticalCenter = "bottom";
+bullet.interactionsEnabled = false;
+
+var hoverState = bullet.states.create("hover");
+var outlineCircle = bullet.createChild(am4core.Circle);
+outlineCircle.adapter.add("radius", function (radius, target) {
+    var circleBullet = target.parent;
+    return circleBullet.circle.pixelRadius + 10;
+})
+
+var image = bullet.createChild(am4core.Image);
+image.width = 60;
+image.height = 60;
+image.horizontalCenter = "middle";
+image.verticalCenter = "middle";
+image.propertyFields.href = "href";
+
+image.adapter.add("mask", function (mask, target) {
+    var circleBullet = target.parent;
+    return circleBullet.circle;
+})
+
+var previousBullet;
+chart.cursor.events.on("cursorpositionchanged", function (event) {
+    var dataItem = series.tooltipDataItem;
+
+    if (dataItem.column) {
+        var bullet = dataItem.column.children.getIndex(1);
+
+        if (previousBullet && previousBullet != bullet) {
+            previousBullet.isHover = false;
+        }
+
+        if (previousBullet != bullet) {
+
+            var hs = bullet.states.getKey("hover");
+            hs.properties.dy = -bullet.parent.pixelHeight + 30;
+            bullet.isHover = true;
+
+            previousBullet = bullet;
+        }
+    }
+})
+
+}); // end am4core.ready()
+</script>
+  <script>
+  am4core.ready(function() {
+
+  // Themes begin
+  am4core.useTheme(am4themes_dark);
+  am4core.useTheme(am4themes_animated);
+  // Themes end
+
+  /**
+   * Chart design taken from Samsung health app
+   */
+
+  var chart = am4core.create("chartdiv", am4charts.XYChart);
+  chart.hiddenState.properties.opacity = 0; // this creates initial fade-in
+
+  chart.paddingBottom = 30;
+
+
+
+  var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+  categoryAxis.dataFields.category = "name";
+  categoryAxis.renderer.grid.template.strokeOpacity = 0;
+  categoryAxis.renderer.minGridDistance = 10;
+  categoryAxis.renderer.labels.template.dy = 35;
+  categoryAxis.renderer.tooltip.dy = 35;
+
+  var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+  valueAxis.renderer.inside = true;
+  valueAxis.renderer.labels.template.fillOpacity = 0.3;
+  valueAxis.renderer.grid.template.strokeOpacity = 0;
+  valueAxis.min = 0;
+  valueAxis.cursorTooltipEnabled = false;
+  valueAxis.renderer.baseGrid.strokeOpacity = 0;
+
+  var series = chart.series.push(new am4charts.ColumnSeries);
+  series.dataFields.valueY = "steps";
+  series.dataFields.categoryX = "name";
+  series.tooltipText = "{valueY.value}";
+  series.tooltip.pointerOrientation = "vertical";
+  series.tooltip.dy = - 6;
+  series.columnsContainer.zIndex = 100;
+
+  var columnTemplate = series.columns.template;
+  columnTemplate.width = am4core.percent(50);
+  columnTemplate.maxWidth = 66;
+  columnTemplate.column.cornerRadius(60, 60, 10, 10);
+  columnTemplate.strokeOpacity = 0;
+
+  series.heatRules.push({ target: columnTemplate, property: "fill", dataField: "valueY", min: am4core.color("#e5dc36"), max: am4core.color("#5faa46") });
+  series.mainContainer.mask = undefined;
+
+  var cursor = new am4charts.XYCursor();
+  chart.cursor = cursor;
+  cursor.lineX.disabled = true;
+  cursor.lineY.disabled = true;
+  cursor.behavior = "none";
+
+  var bullet = columnTemplate.createChild(am4charts.CircleBullet);
+  bullet.circle.radius = 30;
+  bullet.valign = "bottom";
+  bullet.align = "center";
+  bullet.isMeasured = true;
+  bullet.mouseEnabled = false;
+  bullet.verticalCenter = "bottom";
+  bullet.interactionsEnabled = false;
+
+  var hoverState = bullet.states.create("hover");
+  var outlineCircle = bullet.createChild(am4core.Circle);
+  outlineCircle.adapter.add("radius", function (radius, target) {
+      var circleBullet = target.parent;
+      return circleBullet.circle.pixelRadius + 10;
+  })
+
+  var image = bullet.createChild(am4core.Image);
+  image.width = 60;
+  image.height = 60;
+  image.horizontalCenter = "middle";
+  image.verticalCenter = "middle";
+  image.propertyFields.href = "href";
+
+  image.adapter.add("mask", function (mask, target) {
+      var circleBullet = target.parent;
+      return circleBullet.circle;
+  })
+
+  var previousBullet;
+  chart.cursor.events.on("cursorpositionchanged", function (event) {
+      var dataItem = series.tooltipDataItem;
+
+      if (dataItem.column) {
+          var bullet = dataItem.column.children.getIndex(1);
+
+          if (previousBullet && previousBullet != bullet) {
+              previousBullet.isHover = false;
+          }
+
+          if (previousBullet != bullet) {
+
+              var hs = bullet.states.getKey("hover");
+              hs.properties.dy = -bullet.parent.pixelHeight + 30;
+              bullet.isHover = true;
+
+              previousBullet = bullet;
+          }
+      }
+  })
+
+  }); // end am4core.ready()
+  </script>
   <body  style="background-color:#000000;">
     <div class="container">
 
@@ -18,7 +285,7 @@
       {% for i in range(m|int) %}
       <div class="col-lg-3 col-md-4 col-6">
         <a href="#" class="d-block mb-4 h-100">
-              <img class="img-fluid img-thumbnail" src="{{url_for('send_file',filename=mult[i][:])}}" alt="">
+              <img class="img-fluid img-thumbnail" src="{{url_for('send_file',filename=mult[i][:])}}" style="width:292.5px;height:152.25px">
             </a>
       </div>
       {% endfor %}
@@ -26,18 +293,18 @@
       {% for i in range(7) %}
       <div class="col-lg-3 col-md-4 col-6">
         <a href="#" class="d-block mb-4 h-100">
-              <img class="img-fluid img-thumbnail" src="{{url_for('send_file',filename=mult[i][:])}}" alt="">
+              <img class="img-fluid img-thumbnail" src="{{url_for('send_file',filename=mult[i][:])}}" style="width:292.5px;height:152.25px">
             </a>
       </div>
       {% endfor %}
       <div class="col-lg-3 col-md-4 col-6">
-        <a href="/show-all" class="d-block mb-4 h-100">
-              <img class="img-fluid img-thumbnail" src="{{url_for('static',filename='view-all.jpg')}}" alt="">
+        <a href="/showallmultiple" class="d-block mb-4 h-100">
+              <img class="img-fluid img-thumbnail" src="{{url_for('static',filename='view-all.jpg')}}"  style="width:292.5px;height:152.25px">
             </a>
       </div>
     {% endif %}
   {% else %}
-  <h2 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">No Images Found </h2>
+  <h2 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">No Multiple Faces Detected </h2>
   {% endif %}
   </div>
 
@@ -53,7 +320,7 @@
     {% for i in range(p|int) %}
     <div class="col-lg-3 col-md-4 col-6">
       <a href="#" class="d-block mb-4 h-100">
-            <img class="img-fluid img-thumbnail" src="{{url_for('send_file_phone',filename=phon[i][:])}}" alt="">
+            <img class="img-fluid img-thumbnail" src="{{url_for('send_file_phone',filename=phon[i][:])}}"  style="width:292.5px;height:152.25px">
           </a>
     </div>
     {% endfor %}
@@ -61,22 +328,30 @@
     {% for i in range(7) %}
     <div class="col-lg-3 col-md-4 col-6">
       <a href="#" class="d-block mb-4 h-100">
-            <img class="img-fluid img-thumbnail" src="{{url_for('send_file_phone',filename=phon[i][:])}}" alt="">
+            <img class="img-fluid img-thumbnail" src="{{url_for('send_file_phone',filename=phon[i][:])}}"  style="width:292.5px;height:152.25px">
           </a>
     </div>
     {% endfor %}
     <div class="col-lg-3 col-md-4 col-6">
-      <a href="/show-all" class="d-block mb-4 h-100">
-            <img class="img-fluid img-thumbnail" src="{{url_for('stat',filename='view-all.jpg')}}" alt="">
+      <a href="/showallphones" class="d-block mb-4 h-100">
+            <img class="img-fluid img-thumbnail" src="{{url_for('static',filename='view-all.jpg')}}"  style="width:292.5px;height:152.25px">
           </a>
     </div>
   {% endif %}
 {% else %}
-<h2 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">No Images Found </h2>
+<h2 class="font-weight-light text-center text-lg-left mt-4 mb-0" style="color:white">No Phones Detected </h2>
 {% endif %}
 </div>
-
-
+</div>
+<div class="container">
+  <div id="chartdiv"></div>
+</div>
+<div class="row">
+  <div class="col text-center">
+      <p style="color:white"> Help me out for future predictions !! Are the results True?</p>
+      <a id="btnSearch" class="btn btn-success btn-md center-block" Style="width: 100px;" href="{{url_for('add_output_data',data_op='NO',data_without_op =data_without_op)}}" >NO</a>
+       <a id="btnClear" class="btn btn-danger btn-md center-block" Style="width: 100px;" href="{{url_for('add_output_data',data_op='YES',data_without_op =data_without_op)}}" >YES</a>
+   </div>
 </div>
   </body>
 </html>
