@@ -8,22 +8,39 @@ from flask import send_from_directory
 import spacy
 import speech_recognition as sr
 from moviepy.editor import *
+import glob
+from csv import writer
 app = Flask(__name__)
 
 VIDEO_FOLDER = "D:\\Main Project\\Main Web-App\\uploads\\videos"
 QUESTION_PAPER_FOLDER = "D:\\Main Project\\Main Web-App\\uploads\\question_paper"
 RESULT_FOLDER = "D:\\Main Project\\Main Web-App\\results\\"
 TMP_PATH="D:\\Main Project\\Main Web-App\\temp\\"
-MULTIPLE_FACE_PATH = "D:\\Main Project\\Main Web-App\\Multiple_faces"
+MULTIPLE_FACE_PATH = "D:\\Main Project\\Main Web-App\\Multiple_faces\\"
 AUDIO_PATH = "D:\\Main Project\\Main Web-App\\Audio\\"
 detection_config_path = "D:\\Main Project\\Main Web-App\\Models\\detection_config.json"
 detection_model_path = "D:\\Main Project\\Main Web-App\\Models\\detection_model-ex-010--loss-0004.931.h5"
 emotion_model_path= "D:\\Main Project\\Main Web-App\\Models\\fer2013_mini_XCEPTION.102-0.66.hdf5"
 frontal_face_path = "D:\\Main Project\\Main Web-App\\Models\\haarcascade_frontalface_default.xml"
-
+dataset_path = 'D:\\Main Project\\Main Web-App\\dataset\\dataset.csv'
 @app.route('/')
 def index():
+    folders=[TMP_PATH,MULTIPLE_FACE_PATH,RESULT_FOLDER,VIDEO_FOLDER,QUESTION_PAPER_FOLDER]
+    for i in folders:
+        files = glob.glob(i+"\\*")
+        for f in files:
+            os.remove(f)
     return render_template('index.html')
+
+def calculateProbability(listname,weightage):
+    return (float(listname.count(1))/len(listname))*weightage
+def create_dataset(d):
+    with open(dataset_path, 'a+', newline='') as write_obj:
+        # Create a writer object from csv module
+        csv_writer = writer(write_obj)
+        # Add contents of list as last row in the csv file
+        csv_writer.writerow(d)
+    print("successfully added to the dataset thanks for your contribution")
 
 @app.route('/upload', methods=['POST','GET'])
 def upload_file():
@@ -40,20 +57,57 @@ def upload_file():
         m,p = multiple_faces_and_phone(video_full_path)
         emotions = emotion(video_full_path)
         path_of_audio = extract_audio_from_video(video_full_path)
-        extracted_text = convert_audio_to_text(path_of_audio)
+        extracted_text = convert_audio_to_text("D:\\Main Project\\Main Web-App\\Audio\\audio.wav")
         similarity = get_similarity(question_paper_full_path,extracted_text)
-        if m.count(1)>10 and p.count(1)>5 and emotions['fear'] > 2 and similarity > 40:
-            res = "True"
-        else:
-            res = "False"
-    return render_template('output.html',result = res)
-@app.route('/show')
-def show():
+        totalweigh = 0
+        data={}
+        emotion_freq = emotions.values()
+        data['Multiple_faces'] = calculateProbability(m,0.2)
+        data['phone']  = calculateProbability(p,0.5)
+        data['fear'] = ((float(emotions['fear']))/sum(emotion_freq))*0.15
+        data['similarity']  =(similarity/100)*0.15
+        data_list=data.values()
+        totalweigh = data['Multiple_faces']+data['phone'] +data['fear']+data['similarity']
+    return render_template('output.html',result = totalweigh,emotions = emotion_freq,data=data_list)
+@app.route('/show/<emotions>/<data_without_op>')
+def show(emotions,data_without_op):
+    print(emotions)
+    #################
+    print(data_without_op)
+    emotions = list(map(int,emotions[1:len(emotions)-1].split(",")))
+    data_without_op = list(data_without_op[1:len(data_without_op)-1].split(","))
     mult=os.listdir(MULTIPLE_FACE_PATH)
     phon=os.listdir(RESULT_FOLDER)
     m=len(mult)
     p=len(phon)
-    return render_template('results.html',mult = mult,m=m,phon=phon,p=p)
+    return render_template('results.html',mult = mult,m=m,phon=phon,p=p,emotions=emotions,data_without_op=data_without_op)
+@app.route('/Multiple_faces/<filename>')
+def send_file(filename):
+    return send_from_directory(MULTIPLE_FACE_PATH, filename)
+
+@app.route('/results/<filename>')
+def send_file_phone(filename):
+    return send_from_directory(RESULT_FOLDER, filename)
+
+@app.route('/add_output_data/<data_op>/<data_without_op>')
+def add_output_data(data_op,data_without_op):
+    data = list(data_without_op[1:len(data_without_op)-1].split(","))
+    data.append(data_op)
+    create_dataset(data)
+    print("Added to data set thanks for contributing")
+    return render_template('index.html')
+
+
+@app.route('/showallmultiple')
+def showallmultiple():
+    mult=os.listdir(MULTIPLE_FACE_PATH)
+    m=len(mult)
+    return render_template("thumnails.html",mult=mult,m=m)
+@app.route('/showallphones')
+def showallphones():
+    phon=os.listdir(RESULT_FOLDER)
+    p=len(phon)
+    return render_template("thumnails.html",phon=phon,p=p)
 def multiple_faces_and_phone(video_file):
     detector =  cv2.CascadeClassifier(frontal_face_path)
     cap = cv2.VideoCapture(video_file)
@@ -66,7 +120,7 @@ def multiple_faces_and_phone(video_file):
     phone_count=[]
     while(length>0):
         mul_count=0
-        if((currentFrame % fps == 0)):
+        if((currentFrame % 10 == 0)):
             _, img = cap.read()
             tmp_path=TMP_PATH+str(currentFrame)+".png"
             cv2.imwrite(tmp_path,img)
@@ -85,15 +139,13 @@ def multiple_faces_and_phone(video_file):
             else:
                 mul_faces.append(0)
             detected = phone(tmp_path)
-            if detected:
-                phone_count.append(1)
-            else:
-                phone_count.append(0)
+            print("Phone detected ",detected)
+            phone_count.append(detected)
             os.remove(tmp_path)
+            print(mul_faces)
+            print(phone_count)
         currentFrame = currentFrame+1
         length = length-1
-    print(mul_faces)
-    print(phone_count)
     return mul_faces,phone_count
 def emotion(video_path):
     emotion = Emotion(frontal_face_path,emotion_model_path,video_path)
@@ -106,7 +158,8 @@ def emotion(video_path):
 
 def phone(img):
     phone = Phone(detection_model_path,detection_config_path,RESULT_FOLDER)
-    phone.detect_phone(img)
+    detected = phone.detect_phone(img)
+    return detected
 
 def draw_bounding_box(face_coordinates, image_array, color):
     x, y, w, h = face_coordinates
@@ -142,12 +195,8 @@ def get_similarity(question_paper_full_path,extracted_text):
     similarity = d1.similarity(d2)
     return similarity
 
-@app.route('/Multiple_faces/<filename>')
-def send_file(filename):
-    return send_from_directory(MULTIPLE_FACE_PATH, filename)
-@app.route('/results/<filename>')
-def send_file_phone(filename):
-    return send_from_directory(RESULT_FOLDER, filename)
+
+
 if __name__ == '__main__':
     app.run()
     app.debug = True
